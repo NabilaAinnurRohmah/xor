@@ -6,9 +6,7 @@ use Illuminate\Http\Request;
 
 class XorCipherController extends Controller
 {
-    // =========================
     // ASCII TABLE MANUAL
-    // =========================
 
     private $ascii = [
 
@@ -32,18 +30,14 @@ class XorCipherController extends Controller
         ' '=>32
     ];
 
-    // =========================
     // CHAR -> ASCII
-    // =========================
 
     private function charToAscii($char)
     {
         return $this->ascii[$char] ?? 0;
     }
 
-    // =========================
     // ASCII -> CHAR
-    // =========================
 
     private function asciiToChar($ascii)
     {
@@ -57,9 +51,7 @@ class XorCipherController extends Controller
         return '-';
     }
 
-    // =========================
     // DECIMAL -> BINARY
-    // =========================
 
     private function decimalToBinary($number)
     {
@@ -79,9 +71,7 @@ class XorCipherController extends Controller
         return $binary;
     }
 
-    // =========================
     // BINARY -> DECIMAL
-    // =========================
 
     private function binaryToDecimal($binary)
     {
@@ -102,9 +92,7 @@ class XorCipherController extends Controller
         return $decimal;
     }
 
-    // =========================
     // TEXT -> BINARY
-    // =========================
 
     private function textToBinary($text)
     {
@@ -126,9 +114,7 @@ class XorCipherController extends Controller
         return $result;
     }
 
-    // =========================
     // XOR MANUAL
-    // =========================
 
     private function xorBinary($bin1, $bin2)
     {
@@ -146,9 +132,7 @@ class XorCipherController extends Controller
         return $hasil;
     }
 
-    // =========================
     // CEK INPUT BINARY
-    // =========================
 
     private function isBinaryInput($text)
     {
@@ -166,18 +150,10 @@ class XorCipherController extends Controller
         return true;
     }
 
-    // =========================
-    // HALAMAN
-    // =========================
-
     public function index()
     {
         return view('xor');
     }
-
-    // =========================
-    // PROCESS
-    // =========================
 
     public function process(Request $request)
     {
@@ -186,10 +162,6 @@ class XorCipherController extends Controller
         $input = trim($request->text);
 
         $key = $request->key;
-
-        // =========================
-        // INPUT MODE
-        // =========================
 
         if ($this->isBinaryInput($input)) {
 
@@ -211,10 +183,6 @@ class XorCipherController extends Controller
             $key
         );
 
-        // =========================
-        // XOR PROCESS
-        // =========================
-
         $resultBinary = [];
 
         $resultText = '';
@@ -227,7 +195,6 @@ class XorCipherController extends Controller
                 $i % count($keyBinary)
             ];
 
-            // XOR
 
             $xor = $this->xorBinary(
                 $binInput,
