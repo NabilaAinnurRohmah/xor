@@ -6,79 +6,22 @@ use Illuminate\Http\Request;
 
 class XorCipherController extends Controller
 {
-    private $ascii = [
-
-        'A' => 65, 'B' => 66, 'C' => 67, 'D' => 68, 'E' => 69,
-        'F' => 70, 'G' => 71, 'H' => 72, 'I' => 73, 'J' => 74,
-        'K' => 75, 'L' => 76, 'M' => 77, 'N' => 78, 'O' => 79,
-        'P' => 80, 'Q' => 81, 'R' => 82, 'S' => 83, 'T' => 84,
-        'U' => 85, 'V' => 86, 'W' => 87, 'X' => 88, 'Y' => 89,
-        'Z' => 90,
-
-        'a' => 97, 'b' => 98, 'c' => 99, 'd' => 100, 'e' => 101,
-        'f' => 102, 'g' => 103, 'h' => 104, 'i' => 105, 'j' => 106,
-        'k' => 107, 'l' => 108, 'm' => 109, 'n' => 110, 'o' => 111,
-        'p' => 112, 'q' => 113, 'r' => 114, 's' => 115, 't' => 116,
-        'u' => 117, 'v' => 118, 'w' => 119, 'x' => 120, 'y' => 121,
-        'z' => 122,
-
-        '0' => 48, '1' => 49, '2' => 50, '3' => 51, '4' => 52,
-        '5' => 53, '6' => 54, '7' => 55, '8' => 56, '9' => 57,
-
-        ' ' => 32,
-        '.' => 46,
-        ',' => 44,
-        '-' => 45,
-        '_' => 95,
-        '/' => 47,
-        '@' => 64,
-        '!' => 33,
-        '#' => 35,
-        ':' => 58,
-        ';' => 59,
-        '?' => 63,
-        '=' => 61,
-        '+' => 43,
-        '*' => 42,
-        '%' => 37,
-        '$' => 36,
-        '&' => 38,
-        '(' => 40,
-        ')' => 41,
-        '[' => 91,
-        ']' => 93,
-        '{' => 123,
-        '}' => 125,
-        '<' => 60,
-        '>' => 62,
-        '"' => 34,
-        "'" => 39,
-        '\\' => 92,
-        '|' => 124,
-        '^' => 94,
-        '~' => 126,
-        '`' => 96,
-    ];
-
     private function charToAscii($char)
     {
-        return $this->ascii[$char] ?? 0;
+        return ord($char);
     }
 
     private function asciiToChar($ascii)
     {
-        foreach ($this->ascii as $char => $code) {
-
-            if ($code == $ascii) {
-                return $char;
-            }
-        }
-
-        return '-';
+        return chr($ascii);
     }
 
     private function decimalToBinary($number)
     {
+        if ($number == 0) {
+            return '00000000';
+        }
+
         $binary = '';
 
         while ($number > 0) {
@@ -89,6 +32,7 @@ class XorCipherController extends Controller
         }
 
         while (strlen($binary) < 8) {
+
             $binary = '0'.$binary;
         }
 
@@ -141,8 +85,11 @@ class XorCipherController extends Controller
         for ($i = 0; $i < 8; $i++) {
 
             if ($bin1[$i] == $bin2[$i]) {
+
                 $hasil .= '0';
+
             } else {
+
                 $hasil .= '1';
             }
         }
@@ -152,14 +99,28 @@ class XorCipherController extends Controller
 
     private function isBinaryInput($text)
     {
-        for ($i = 0; $i < strlen($text); $i++) {
+        $text = trim($text);
 
-            if (
-                $text[$i] != '0' &&
-                $text[$i] != '1' &&
-                $text[$i] != ' '
-            ) {
+        if ($text == '') {
+            return false;
+        }
+
+        $parts = explode(' ', $text);
+
+        foreach ($parts as $part) {
+
+            if (strlen($part) != 8) {
                 return false;
+            }
+
+            for ($i = 0; $i < strlen($part); $i++) {
+
+                if (
+                    $part[$i] != '0' &&
+                    $part[$i] != '1'
+                ) {
+                    return false;
+                }
             }
         }
 
@@ -177,7 +138,7 @@ class XorCipherController extends Controller
 
         $input = trim($request->text);
 
-        $key = $request->key;
+        $key = trim($request->key);
 
         if ($this->isBinaryInput($input)) {
 
@@ -193,9 +154,27 @@ class XorCipherController extends Controller
             );
         }
 
-        $keyBinary = $this->textToBinary(
-            $key
-        );
+        if ($this->isBinaryInput($key)) {
+
+            $keyBinary = explode(
+                ' ',
+                $key
+            );
+
+        } else {
+
+            $keyBinary = $this->textToBinary(
+                $key
+            );
+        }
+
+        if (count($keyBinary) == 0) {
+
+            return back()->with(
+                'error',
+                'Key tidak boleh kosong'
+            );
+        }
 
         $resultBinary = [];
 
@@ -220,9 +199,19 @@ class XorCipherController extends Controller
                 $xor
             );
 
-            $resultText .= $this->asciiToChar(
-                $decimal
-            );
+            if (
+                ($decimal >= 0 && $decimal <= 31) ||
+                $decimal == 127
+            ) {
+
+                $resultText .= '['.$decimal.']';
+
+            } else {
+
+                $resultText .= $this->asciiToChar(
+                    $decimal
+                );
+            }
         }
 
         return view('xor', [
