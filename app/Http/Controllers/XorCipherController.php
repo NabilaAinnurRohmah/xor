@@ -18,10 +18,6 @@ class XorCipherController extends Controller
 
     private function decimalToBinary($number)
     {
-        if ($number == 0) {
-            return '00000000';
-        }
-
         $binary = '';
 
         while ($number > 0) {
