@@ -48,8 +48,13 @@
 
 <body>
 
-    <div class="container">
 
+    <div class="container">
+        @if (session('error'))
+            <p style="color:red">
+                {{ session('error') }}
+            </p>
+        @endif
         <h2>XOR Cipher</h2>
 
         <form method="POST" action="/xor">
