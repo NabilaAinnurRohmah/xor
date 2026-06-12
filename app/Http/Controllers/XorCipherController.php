@@ -172,6 +172,13 @@ class XorCipherController extends Controller
             );
         }
 
+        if ($input == '') {
+            return back()->with(
+                'error',
+                'Input tidak boleh kosong'
+            );
+        }
+
         $resultBinary = [];
 
         $resultText = '';
